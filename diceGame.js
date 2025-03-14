@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import readline from "readline";
+import { table } from "console";
 
 class KeyGenerator{
     static generateKey(){
@@ -61,9 +62,11 @@ class ProbabilituCalc{
 
     static showProbabilities(probabilities){
         console.log("Probabilitu Table:");
-        probabilities.forEach((row, i) => {
-            console.log(`Dice${i + 1}: ${row.join(" | ")}`);
-        });
+        // probabilities.forEach((row, i) => {
+        //     console.log(`Dice${i + 1}: ${row.join(" | ")}`);
+        // });
+
+        console.log(table(probabilities));
     }
 }
 
