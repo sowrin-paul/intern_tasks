@@ -127,9 +127,6 @@ class Game {
         const userDiceIndex = await FairRandomGenerator.getNumber(diceSet.length);
         console.log(`You chose Dice ${userDiceIndex + 1}.`);
 
-        const userThrow = await FairRandomGenerator.generateNumber(6);
-        const computerThrow = await FairRandomGenerator.generateNumber(6);
-
         const userResult = diceSet[userDiceIndex].roll();
         const computerResult = diceSet[(userDiceIndex + 1) % diceSet.length].roll();
 
