@@ -58,7 +58,7 @@ class ProbabilituCalc{
         return result;
     }
 
-    static showProbabilityTable(probabilities){
+    static showProbabilityTable(probabilities, diceSet){
         const column = ["User dice v", ...diceSet.map((_, i) => `Dice ${i + 1}`)];
         const data = probabilities.map((row, i) => [`Dice ${i + 1}`, ...row]);
         const output = table([column, ...data]);
@@ -106,44 +106,52 @@ class FairRandomGenerator{
     }
 }
 
-class Game{
-    constructor(diceSet){
-        this.diceSet = diceSet;
-    }
+class Game {
+    static async play(args) {
+        const diceSet = DiceParser.parse(args);
 
-    async play(){
-        console.log("start the game...");
-        const range = this.diceSet.length;
-        const diceIndex = await FairRandomGenerator.generateNumber(range);
+        console.log('Let\'s determine who makes the first move.');
+        const firstMove = await FairRandomGenerator.generateNumber(2);
 
-        console.log(`you will use dice ${diceIndex + 1}`);
+        if (firstMove === 0) {
+            console.log('You make the first move.');
+        } else {
+            console.log('Computer makes the first move.');
+        }
 
-        const roll = this.diceSet.map(dice => dice.roll());
-        const winner = roll.indexOf(Math.max(...roll));
+        console.log('Choose your dice:');
+        diceSet.forEach((dice, index) => {
+            console.log(`${index} - ${dice.faces.join(",")}`);
+        });
 
-        console.log(`Rolls: ${roll.join(", ")}`);
-        console.log(`winner: dice ${winner + 1}`);
+        const userDiceIndex = await FairRandomGenerator.getNumber(diceSet.length);
+        console.log(`You chose Dice ${userDiceIndex + 1}.`);
+
+        const userThrow = await FairRandomGenerator.generateNumber(6);
+        const computerThrow = await FairRandomGenerator.generateNumber(6);
+
+        const userResult = diceSet[userDiceIndex].roll();
+        const computerResult = diceSet[(userDiceIndex + 1) % diceSet.length].roll();
+
+        console.log(`Your roll result: ${userResult}`);
+        console.log(`Computer's roll result: ${computerResult}`);
+
+        if (userResult > computerResult) {
+            console.log('You win!');
+        } else if (userResult < computerResult) {
+            console.log('Computer wins!');
+        } else {
+            console.log('It\'s a draw!');
+        }
+
+        const probabilities = ProbabilituCalc.calculateProbability(diceSet);
+        ProbabilituCalc.showProbabilityTable(probabilities, diceSet);
     }
 }
 
-const main = async () => {
-    try{
-        const args = process.argv.slice(2);
-        if(args.length < 2){
-            console.log("Provide at least two dice as arguments.");
-            return;
-        }
-
-        const diceSet = DiceParser.parse(args);
-        const probabilities = ProbabilituCalc.calculateProbability(diceSet);
-        ProbabilituCalc.showProbabilities(probabilities);
-
-        const game = new Game(diceSet);
-        await game.play();
-    }
-    catch(e){
-        console.log(`Error: ${e.message}`);
-    }
-};
-
-main();
+const args = process.argv.slice(2);
+if (args.length < 2) {
+    console.log('Provide at least two dice as arguments.');
+} else {
+    Game.play(args);
+}
