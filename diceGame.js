@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import readline from "readline";
-import { table } from "console";
+import { table } from "table";
 
 class KeyGenerator{
     static generateKey(){
@@ -51,22 +51,20 @@ class ProbabilituCalc{
                         const roll2 = diceSet[j].roll();
                         if(roll1 > roll2) wins++;
                     }
-                    result[i][j] = (wins / trail * 100).toFixed(2) + "%";
-                }else{
-                    result[i][j] = "N/A";
+                    result[i][j] = (wins / trail ).toFixed(2);
                 }
             }
         }
         return result;
     }
 
-    static showProbabilities(probabilities){
-        console.log("Probabilitu Table:");
-        // probabilities.forEach((row, i) => {
-        //     console.log(`Dice${i + 1}: ${row.join(" | ")}`);
-        // });
+    static showProbabilityTable(probabilities){
+        const column = ["User dice v", ...diceSet.map((_, i) => `Dice ${i + 1}`)];
+        const data = probabilities.map((row, i) => [`Dice ${i + 1}`, ...row]);
+        const output = table([column, ...data]);
 
-        console.log(table(probabilities));
+        console.log("Probability of the win for the user: ");
+        console.log(output);
     }
 }
 
